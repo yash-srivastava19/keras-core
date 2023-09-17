@@ -929,3 +929,36 @@ def rsqrt(x):
         return Rsqrt().symbolic_call(x)
     x = backend.convert_to_tensor(x)
     return backend.math.rsqrt(x)
+
+class ERF(Operation):
+    """ Elementwise error function(Gauss Error Function)."""
+    def __init__(self, x):
+        super().__init__()
+        self.x = x
+    
+    def compute_output_spec(self, x):
+        return KerasTensor(x.shape, dtype=x.dtype)
+
+    def call(self, x):
+        return backend.math.erf(x)
+
+@keras_core_export("keras_core.ops.erf")
+def erf(x):
+    """ Computes the erf of segments in a tensor.
+
+    Args:
+        data: Input tensor.
+
+    Returns:
+        A tensor containing the error function of segments, where each element
+        represents the error function of the corresponding segment in `x`.
+
+    Example:
+
+    >>> data = keras_core.ops.convert_to_tensor([1, 2, 10, 20, 100, 200])
+    >>> keras_core.ops.erf(data)
+    array([2, 20, 200], dtype=int32)"""
+    
+    if any_symbolic_tensors((x,)):
+        return ERF(x).symbolic_call(x)
+    return backend.math.erf(x)
